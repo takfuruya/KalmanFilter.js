@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Kalman Filter Example</title>
+
+<script type="text/javascript" src="../build/KalmanFilter.js"></script>
+<script type="text/javascript">
+	var A, B, H, Q, R;
+	var x, P;
+	var kalmanFilter;
+	
+	init();
+	loop();
+
+	function init() {
+		
+		// define model
+		A = [[3, 0], [3, 4]];	// state transition matrix
+		B = [[0, 0], [0, 0]];	// input matrix
+		H = [[1, 0], [0, 1]];	// observation matrix
+		Q = [[1, 0], [0, 1]];	// process noise covariance matrix
+		R = [[1, 0], [0, 1]];	// measurement noise covariance matrix
+		
+		// initialize state and its error
+		x = [0, 0];		// state vector
+		P = [[0, 0], [0, 0]];	// covariance matrix
+		
+		kalmanFilter = new KF.KalmanFilter(A, B, H, Q, R, x, P);
+		
+		// predict (compute a priori estimate)
+		kalmanFilter.predict();
+	}
+
+	function loop() {
+		
+		var z = measure();
+		var u = getInput();
+		
+		// filter/update (compute a posteriori estimate)
+		var o = kalmanFilter.filter(u);
+		
+		// use x here
+		console.log(o);
+		
+		// predict (compute a priori estimate)
+		kalmanFilter.predict(z);
+	}
+
+</script>
+</head>
+
+<body>Open JavaScript console to see result.</body>
+
+</html>
