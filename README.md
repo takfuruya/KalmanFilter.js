@@ -18,7 +18,8 @@ Also include [sylvester](http://sylvester.jcoglan.com/), a JavaScript matrix lib
 <script src="js/KalmanFilter.js"></script>
 ```
 
-This code outputs a posteriori (filtered/updated) state estimate and its covariance matrix (its error).
+The code below computes Kalman filter for constant velocity trajectory model with a random walk velocity (in one dimension) and position measured at every 0.5 sec.
+It outputs a posteriori (filtered/updated) state estimate and its covariance matrix (its error).
 
 ```html
 <script>
@@ -26,10 +27,11 @@ This code outputs a posteriori (filtered/updated) state estimate and its covaria
 	var A, B, H, Q, R;
 	var x, P;
 	var kalmanFilter;
+	var t = 0.5;	// time step (sec)
 	
 	init();
-	loop();
-
+	setInterval(loop, t*1000);
+	
 	function init() {
 		
 		/* --- define model ---
@@ -40,14 +42,13 @@ This code outputs a posteriori (filtered/updated) state estimate and its covaria
 		
 		// state transition matrix
 		A = $M([
-			[3, 0], 
-			[3, 4]
+			[1, t], 
+			[0, 1]
 		]);
 		
 		// observation matrix
 		H = $M([
-			[1, 0],
-			[0, 1]
+			[1, 0]
 		]);
 		
 		// process noise covariance matrix
@@ -59,15 +60,18 @@ This code outputs a posteriori (filtered/updated) state estimate and its covaria
 		// measurement noise covariance matrix
 		R = $M([
 			[1, 0],
-			[0, 1]
+			[0, 0]
 		]);
 		
 		
 		/* --- initialize state and its error ---
 		*/
 		
-		// state vector
-		x = $M([0, 0]);
+		// state vector (position & velocity)
+		x = $M([
+			[0],
+			[0]
+		);
 		
 		// covariance matrix
 		P = $M([
