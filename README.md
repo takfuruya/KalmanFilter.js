@@ -6,11 +6,14 @@ KalmanFilter.js
 The aim of this project is to create a Kalman Filter library with a very low level of complexity (that is, easy to use for learners).
 The library is planned to support Extended Kalman Filter and Unscented Kalman Filter.
 
-[Examples](http://www.google.com) - [General Kalman Filter Usage Tutorial]() - [Demo]()
+* [Demo]()
+* [Examples](http://www.google.com)
+* [Documentation]()
+* [General Kalman Filter Usage]()
 
 ### Usage ###
 
-Download the [minified library](http://takfuruya.github.com/KalmanFilter.js/build/KalmanFilter.js) and include it in your html.
+Download the [minified library](http://takfuruya.github.com/KalmanFilter.js/build/KalmanFilter.js) (located in build folder) and include it in your html.
 Also include [sylvester](http://sylvester.jcoglan.com/), a JavaScript matrix library, **before** KalmanFilter.js (required).
 
 ```html
@@ -72,7 +75,7 @@ It outputs a posteriori (filtered/updated) state estimate and its covariance mat
 		x = $M([
 			[0],
 			[0]
-		);
+		]);
 		
 		// covariance matrix
 		P = $M([
@@ -106,6 +109,8 @@ It outputs a posteriori (filtered/updated) state estimate and its covariance mat
 
 </script>
 ```
+
+---- This needs to be moved to the example section
 
 ### Usage 2 (with input matrix) ###
 

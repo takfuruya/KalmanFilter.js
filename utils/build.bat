@@ -2,7 +2,7 @@ REM note: this file must reside in this folder
 
 REM merge all js files together
 cd ../src
-copy /A "KF.js" + "EKF.js" "../build/KalmanFilter.js"
+copy /a "KF.js" + "EKF.js" "../build/KalmanFilter.js"
 
 REM minify merged file using closure-compiler
 
