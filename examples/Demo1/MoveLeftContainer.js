@@ -22,7 +22,7 @@ var p = MoveLeftContainer.prototype = new Container();
 		if (this.x + MoveLeftContainer.SPEED > 0) {
 			this.x -= MoveLeftContainer.SPEED;
 		} else {
-			this.getStage().removeChild(this);
+			this.parent.removeChild(this);
 		}
 	}
 	
