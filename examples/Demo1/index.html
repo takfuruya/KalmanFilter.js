@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Kalman Filter Demo 1</title>
+
+<script type="text/javascript" src="../../lib/sylvester.src.js"></script>
+<script type="text/javascript" src="../../src/KF.js"></script>
+<script type="text/javascript" src="../../lib/easeljs-0.4.2.min.js"></script>
+<script type="text/javascript" src="MoveLeftContainer.js"></script>
+<script type="text/javascript" src="Rainbow.js"></script>
+<script type="text/javascript" src="PosterioriLine.js"></script>
+<script type="text/javascript" src="MeasurementLine.js"></script>
+<script type="text/javascript" src="Cat.js"></script>
+<script type="text/javascript" src="Star.js"></script>
+<script type="text/javascript">
+
+var canvas, stage, rainbow, posterioriLine, measurementLine, star, bg;
+var lastY, lastY2;
+
+var A, B, H, Q, R;
+var x, P;
+var kalmanFilter;
+var t = 0.5;	// time step (sec)
+
+function init() {
+	
+	/* ====================
+	   === define model ===
+	   ====================
+	
+		x = Ax + w
+		z = Hz + v
+	*/
+	
+	// state transition matrix
+	A = $M([
+		[1, t], 
+		[0, 1]
+	]);
+	
+	// observation matrix
+	H = $M([
+		[1, 0]
+	]);
+	
+	// process noise covariance matrix
+	Q = $M([
+		[0, 0],
+		[0, 81]
+	]);
+	
+	// measurement noise covariance matrix
+	R = $M([
+		[625]
+	]);
+	
+	
+	/* ====================================
+	   === initialize state & its error ===
+	   ====================================
+	*/
+	
+	// state vector (position & velocity)
+	x = $M([
+		[0],
+		[0]
+	]);
+	
+	// covariance matrix
+	P = $M([
+		[0, 0],
+		[0, 0]
+	]);
+	
+	kalmanFilter = new KF.KalmanFilter(A, null, H, Q, R, x, P);
+	
+	// predict (compute a priori estimate)
+	kalmanFilter.predict();
+	
+	
+	/* ===============================
+	   === set up canvas animation ===
+	   ===============================
+	*/
+	
+	canvas = document.getElementById('canvas');
+	stage = new Stage(canvas);
+	
+	bg = new Container();
+	
+	cat = new Cat();
+	cat.x = 350;
+	
+	lastY = cat.y + Cat.HEIGHT/2;
+	lastY2 = 0;
+	
+	stage.addChild(bg);
+	stage.addChild(cat);
+	stage.update();
+	Ticker.addListener(window);
+}
+
+var timer = 0;
+var TICK_FACTOR = 10;
+
+function tick() {
+	
+	if (Math.random() < 0.1) {
+		star = new Star();
+		star.x = canvas.width;
+		star.y = Math.random()*canvas.height;
+		bg.addChild(star);
+	}
+	
+	rainbow = new Rainbow();
+	rainbow.x = cat.x - MoveLeftContainer.SPEED;
+	rainbow.y = lastY;
+	lastY = cat.y + Cat.HEIGHT/2;
+	stage.addChild(rainbow);
+	
+	timer ++;
+	if (timer % TICK_FACTOR == 0) {
+		loop();
+	}
+	
+	stage.update();
+}
+
+
+function loop() {
+	
+	/* =====================
+	   === Kalman filter ===
+	   =====================
+	*/
+	
+	var z = measure();
+	
+	// filter/update (compute a posteriori estimate)
+	var o = kalmanFilter.filter(z);
+	var estX = o.state.e(1, 1);
+	var errX = Math.sqrt(o.covariance.e(1, 1));
+	
+	// predict (compute a priori estimate)
+	kalmanFilter.predict(z);
+	
+	
+	/* =================
+	   === animation ===
+	   =================
+	*/
+	
+	measurementLine = new MeasurementLine(Math.sqrt(R.e(1, 1)));
+	measurementLine.x = cat.x;
+	measurementLine.y = z.e(1, 1);
+	
+	posterioriLine = new PosterioriLine(MoveLeftContainer.SPEED*TICK_FACTOR,
+										estX - lastY2, errX);
+	posterioriLine.x = cat.x - MoveLeftContainer.SPEED*TICK_FACTOR;
+	posterioriLine.y = lastY2;
+	
+	lastY2 = estX;
+	
+	stage.addChild(measurementLine);
+	stage.addChild(posterioriLine);
+}
+
+
+// returns normal random number centered at cat's position with standard
+// deviation from measurement covariance (Box-Muller transform)
+function measure() {
+	var x = 0, y = 0, rds, c;
+
+	// Get two random numbers from -1 to 1.
+	// If the radius is zero or greater than 1, throw them out and pick two new ones
+	// Rejection sampling throws away about 20% of the pairs.
+	do {
+	x = Math.random()*2-1;
+	y = Math.random()*2-1;
+	rds = x*x + y*y;
+	}
+	while (rds == 0 || rds > 1)
+
+	// This is the Box-Muller Transform
+	c = Math.sqrt(-2*Math.log(rds)/rds);
+
+	// It always creates a pair of numbers.
+	// x*c and y*c are normal random numbers
+	return $M([
+		[cat.y + Cat.HEIGHT/2 + x*c*Math.sqrt(R.e(1, 1))]
+	]);
+	
+}
+
+</script>
+</head>
+
+<body onload="init();">
+	<canvas id="canvas" width="500" height="300" style="border:1px solid #c3c3c3;background-color:#003366;">
+	</canvas>
+</body>
+
+</html>
