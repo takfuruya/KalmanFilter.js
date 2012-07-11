@@ -2,14 +2,14 @@
  * @ author takfuruya
  */
 
-var KF = KF || {};
+(function(ns) {
 
 
 /*
 KF.KalmanFilter(A, B, H, Q, R, x, P)
 if no input, set B to null
 */
-KF.KalmanFilter = function () {
+var KalmanFilter = function () {
 	
 	this.A = arguments[0];	// state transition matrix
 	this.numState = this.A.rows();
@@ -33,9 +33,9 @@ KF.KalmanFilter = function () {
 	this.I = Matrix.I(this.numState); // identity matrix
 };
 
-KF.KalmanFilter.prototype = {
+KalmanFilter.prototype = {
 	
-	constructor: KF.KalmanFilter,
+	constructor: KalmanFilter,
 	
 	predict: function (u) {
 		var x = this.x;
@@ -103,3 +103,8 @@ KF.KalmanFilter.prototype = {
 	}
 	
 };
+
+ns.KalmanFilter = KalmanFilter;
+
+}(KF||(KF={})));
+var KF;

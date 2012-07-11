@@ -2,36 +2,33 @@
  * @ author takfuruya
  */
 
-( function () {
 
-	var lastTime = 0;
-	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 
-	for ( var x = 0; x < vendors.length && !window.requestAnimationFrame; ++ x ) {
+/*
+KF.UnscentedKalmanFilter()
+*/
 
-		window.requestAnimationFrame = window[ vendors[ x ] + 'RequestAnimationFrame' ];
-		window.cancelAnimationFrame = window[ vendors[ x ] + 'CancelAnimationFrame' ] || window[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
+(function(ns) {
 
+var UnscentedKalmanFilter = function () {
+	// needs to be implemented
+};
+
+UnscentedKalmanFilter.prototype = {
+	
+	constructor: UnscentedKalmanFilter,
+	
+	predict: function (u) {
+		// needs to be implemented
+	},
+	
+	filter: function(z) {
+		// needs to be implemented
 	}
+	
+};
 
-	if ( !window.requestAnimationFrame ) {
+ns.UnscentedKalmanFilter = UnscentedKalmanFilter;
 
-		window.requestAnimationFrame = function ( callback, element ) {
-
-			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-			var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
-			lastTime = currTime + timeToCall;
-			return id;
-
-		};
-
-	}
-
-
-	if ( !window.cancelAnimationFrame ) {
-
-		window.cancelAnimationFrame = function ( id ) { clearTimeout( id ); };
-
-	}
-
-}() );
+}(KF||(KF={})));
+var KF;
